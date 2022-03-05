@@ -16,6 +16,22 @@ blueprint:
         target:
           entity:
             domain: light
+    only_if_light_off:
+      name: Only if light is off
+      description: Only turn light on and set timer if light is currently off
+      selector:
+        boolean:
+    max_brightness:
+      name: Maximum brightness percent
+      description: Brightness to set as the maximum brightness
+      default: 100
+      selector:
+        number:
+          min: 2
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+          step: 1
     no_motion_wait:
       name: Wait time
       description: Time to leave the light on after last motion is detected.
@@ -25,7 +41,8 @@ blueprint:
           min: 0
           max: 3600
           unit_of_measurement: seconds
-    start_time:
+    
+    :
       name: Start Time
       description: Time action should start
       default: "17:00:00"
@@ -43,6 +60,9 @@ blueprint:
 mode: restart
 max_exceeded: silent
 
+variables:
+  only_if_light_off: !input 'only_if_light_off'
+
 trigger:
   platform: state
   entity_id: !input motion_entity
@@ -50,7 +70,7 @@ trigger:
   to: "on"
 condition:
   alias: "Time 17~00"
-  condition: time
+- condition: time
   # At least one of the following is required.
   after: !input start_time
   before: !input end_time
