@@ -1,5 +1,5 @@
 blueprint:
-  name: Motion-activated Light Switch
+  name: Motion-activated Light Switch with Time Range
   description: Turn on a switch when motion is detected.
   domain: automation
   source_url: https://github.com/fabiosoft/HA-Motion-activated-Light-Switch/
@@ -16,18 +16,13 @@ blueprint:
         target:
           entity:
             domain: light
-    only_if_light_off:
-      name: Only if light is off
-      description: Only turn light on and set timer if light is currently off
-      selector:
-        boolean:
-    max_brightness:
-      name: Maximum brightness percent
-      description: Brightness to set as the maximum brightness
+    target_brightness:
+      name: Desired brightness percent
+      description: Brightness to set light when turning on
       default: 100
       selector:
         number:
-          min: 2
+          min: 1
           max: 100
           unit_of_measurement: "%"
           mode: slider
@@ -41,8 +36,7 @@ blueprint:
           min: 0
           max: 3600
           unit_of_measurement: seconds
-    
-    :
+    start_time:
       name: Start Time
       description: Time action should start
       default: "17:00:00"
@@ -60,9 +54,6 @@ blueprint:
 mode: restart
 max_exceeded: silent
 
-variables:
-  only_if_light_off: !input 'only_if_light_off'
-
 trigger:
   platform: state
   entity_id: !input motion_entity
@@ -70,13 +61,15 @@ trigger:
   to: "on"
 condition:
   alias: "Time 17~00"
-- condition: time
+  condition: time
   # At least one of the following is required.
   after: !input start_time
   before: !input end_time
 action:
   - service: switch.turn_on
     target: !input light_target
+    data_template:
+    brightness_pct: "{{ target_brightness | int }}"
   - wait_for_trigger:
       platform: state
       entity_id: !input motion_entity
