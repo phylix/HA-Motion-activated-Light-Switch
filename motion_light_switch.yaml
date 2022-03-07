@@ -2,7 +2,7 @@ blueprint:
   name: Motion-activated Light Switch with Time Range
   description: Turn on a switch when motion is detected.
   domain: automation
-  source_url: https://github.com/fabiosoft/HA-Motion-activated-Light-Switch/
+  source_url: https://github.com/phylix/HA-Motion-activated-Light-Switch
   input:
     motion_entity:
       name: Motion Sensor
